@@ -6,10 +6,9 @@ import org.springframework.validation.annotation.Validated
 
 /**
  * This is to mimic calls to an external 3rd party service that you wouldn't want to test locally.
- * Created by derek on 4/10/17.
  */
 @Service
-@Validated
+@Validated //This makes it a spring proxied service, so unwrapping is necessary to use a Mock
 class ExternalRankingService {
 
     @SuppressWarnings("GrMethodMayBeStatic")

@@ -1,12 +1,13 @@
 package com.objectpartners.eskens.controllers
 
+import com.objectpartners.eskens.config.IntegrationTestMockingConfig
 import com.objectpartners.eskens.services.ExternalRankingService
 import com.objectpartners.eskens.services.Rank
-import org.spockframework.spring.SpringSpy
-import org.spockframework.spring.UnwrapAopProxy
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.util.AopTestUtils
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import spock.lang.Specification
@@ -18,23 +19,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * An integration test illustrating how to wire everything w/ Spring,
  * but replace certain components with Spock mocks
- * Created by derek on 4/10/17.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class PersonControllerIntTest extends Specification {
+@Import([IntegrationTestMockingConfig])  //uses a cached spring context for speed
+class PersonControllerIntCachedTest extends Specification {
 
     @Autowired MockMvc mvc
 
-    /**
-     * SpringSpy will wrap the Spring injected Service with a Spy
-     * UnwrapAopProxy will remove the cglib @Validated proxy annotated inside ExternalRankingService
-     * However it will not use a cached test config, so many tests could be slow.
-     *   see PersonControllerIntCachedTest for how to use the spring cached context config
-     */
-    @SpringSpy
-    @UnwrapAopProxy
+    @Autowired
+    ExternalRankingService proxiedExternalRankingService
+
     ExternalRankingService externalRankingService
+
+    void setup() {
+        /**
+         * the Validated proxied ExternalRankingService must be unwrapped to use the Mock
+         *
+         *   see PersonControllerIntTest to see how to make this easier with @SpringSpy @UnwrapAopProxy
+         */
+        externalRankingService = AopTestUtils.getUltimateTargetObject(proxiedExternalRankingService)
+    }
 
     def "GetRank"() {
 
