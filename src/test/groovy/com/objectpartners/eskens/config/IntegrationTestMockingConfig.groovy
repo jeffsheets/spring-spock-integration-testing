@@ -1,6 +1,7 @@
 package com.objectpartners.eskens.config
 
 import com.objectpartners.eskens.services.ExternalRankingService
+import com.objectpartners.eskens.services.ValidatedExternalRankingService
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import spock.mock.DetachedMockFactory
@@ -17,5 +18,10 @@ class IntegrationTestMockingConfig {
     @Bean
     ExternalRankingService externalRankingService() {
         factory.Mock(ExternalRankingService)
+    }
+
+    @Bean
+    ValidatedExternalRankingService validatedExternalRankingService() {
+        factory.Mock(ValidatedExternalRankingService)
     }
 }

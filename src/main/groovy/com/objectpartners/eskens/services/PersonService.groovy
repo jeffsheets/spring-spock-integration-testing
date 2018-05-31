@@ -1,6 +1,7 @@
 package com.objectpartners.eskens.services
 
 import com.objectpartners.eskens.entities.Person
+import com.objectpartners.eskens.model.Rank
 import com.objectpartners.eskens.repos.PersonRepo
 import org.springframework.stereotype.Service
 
@@ -11,9 +12,12 @@ class PersonService {
 
     final ExternalRankingService externalRankingService
 
-    PersonService(PersonRepo pr, ExternalRankingService ers) {
+    final ValidatedExternalRankingService validatedExternalRankingService
+
+    PersonService(PersonRepo pr, ExternalRankingService ers, ValidatedExternalRankingService vers) {
         this.personRepo = pr
         this.externalRankingService = ers
+        this.validatedExternalRankingService = vers
     }
 
     String getAddressToForPersonId(Long personId) {
@@ -23,6 +27,10 @@ class PersonService {
 
     Rank getRank(Long personId) {
         externalRankingService.getRank(getPerson(personId))
+    }
+
+    Rank getValidatedRank(Long personId) {
+        validatedExternalRankingService.getRank(getPerson(personId))
     }
 
     private Person getPerson(Long personId) {

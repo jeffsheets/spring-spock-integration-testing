@@ -3,6 +3,7 @@ package com.objectpartners.eskens.services
 import com.blogspot.toomuchcoding.spock.subjcollabs.Collaborator
 import com.blogspot.toomuchcoding.spock.subjcollabs.Subject
 import com.objectpartners.eskens.entities.Person
+import com.objectpartners.eskens.model.Rank
 import com.objectpartners.eskens.repos.PersonRepo
 import spock.lang.Specification
 

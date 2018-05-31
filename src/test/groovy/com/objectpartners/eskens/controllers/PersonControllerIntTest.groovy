@@ -1,7 +1,9 @@
 package com.objectpartners.eskens.controllers
 
+import com.objectpartners.eskens.model.Rank
 import com.objectpartners.eskens.services.ExternalRankingService
-import com.objectpartners.eskens.services.Rank
+import com.objectpartners.eskens.services.ValidatedExternalRankingService
+import org.spockframework.spring.SpringBean
 import org.spockframework.spring.SpringSpy
 import org.spockframework.spring.UnwrapAopProxy
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,16 +36,39 @@ class PersonControllerIntTest extends Specification {
      */
     @SpringSpy
     @UnwrapAopProxy
-    ExternalRankingService externalRankingService
+    ValidatedExternalRankingService validatedExternalRankingService
+
+    /**
+     * SpringBean will put the mock into the spring context
+     */
+    @SpringBean
+    ExternalRankingService externalRankingService = Mock()
 
     def "GetRank"() {
-
         when: 'Calling getRank for a known seed data entity'
         MvcResult mvcResult = mvc.perform(get("/persons/1/rank").contentType(APPLICATION_JSON))
                                 .andExpect(status().is2xxSuccessful()).andReturn()
 
         then: 'we define the mock for JUST the external service'
         1 * externalRankingService.getRank(_) >> {
+            new Rank(level: 1, classification: 'Captain')
+        }
+        noExceptionThrown()
+
+        when: 'inspecting the contents'
+        def resultingJson = mvcResult.response.contentAsString
+
+        then: 'the result contains a mix of mocked service data and actual wired component data'
+        resultingJson == 'Capt James Kirk ~ Captain:Level 1'
+    }
+
+    def "GetValidatedRank"() {
+        when: 'Calling getRank for a known seed data entity'
+        MvcResult mvcResult = mvc.perform(get("/persons/1/validatedRank").contentType(APPLICATION_JSON))
+                                .andExpect(status().is2xxSuccessful()).andReturn()
+
+        then: 'we define the mock for the external service'
+        1 * validatedExternalRankingService.getRank(_) >> {
             new Rank(level: 1, classification: 'Captain')
         }
         noExceptionThrown()
