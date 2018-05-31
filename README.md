@@ -1,5 +1,9 @@
 **This is a Spock 1.2 update of the original fork**
 
+Original blog post here: https://objectpartners.com/2017/04/18/spring-integration-testing-with-spock-mocks/
+
+Original source code here: https://github.com/snekse/spring-spock-integration-testing
+
 **How to inject Spock mocks into Spring integration tests**
 
 This project is intended to be used as en example guide to illustrate how you can use Spock with Spring (and Spring Boot) with a mix of Spring configuration and Spock mocks.
