@@ -1,14 +1,14 @@
 package com.objectpartners.eskens.controllers
 
-import com.objectpartners.eskens.config.IntegrationTestMockingConfig
-import com.objectpartners.eskens.services.ExternalRankingService
 import com.objectpartners.eskens.model.Rank
+import com.objectpartners.eskens.services.ExternalRankingService
 import com.objectpartners.eskens.services.ValidatedExternalRankingService
+import org.spockframework.spring.SpringBean
+import org.spockframework.spring.SpringSpy
+import org.spockframework.spring.UnwrapAopProxy
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
-import org.springframework.test.util.AopTestUtils
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import spock.lang.Specification
@@ -20,33 +20,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * An integration test illustrating how to wire everything w/ Spring,
  * but replace certain components with Spock mocks
+ *
+ * Uses Spock 1.2 annotations of @SpringBean, @SpringSpy, and @UnwrapAopProxy
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import([IntegrationTestMockingConfig])  //uses a cached spring context for speed
-class PersonControllerIntCachedTest extends Specification {
+class PersonControllerIntSpock12Test extends Specification {
 
     @Autowired MockMvc mvc
 
-    @Autowired
-    ExternalRankingService externalRankingService
+    /**
+     * SpringBean will put the mock into the spring context
+     */
+    @SpringBean
+    ExternalRankingService externalRankingService = Mock()
 
-    @Autowired
-    ValidatedExternalRankingService proxiedValidatedExternalRankingService
-
+    /**
+     * SpringSpy will wrap the Spring injected Service with a Spy
+     * UnwrapAopProxy will remove the cglib @Validated proxy annotated inside ExternalRankingService
+     * However it will not use a cached test config, so many tests could be slow.
+     *   see PersonControllerIntTest for how to use the spring cached context config
+     */
+    @SpringSpy
+    @UnwrapAopProxy
     ValidatedExternalRankingService validatedExternalRankingService
 
-    void setup() {
-        /**
-         * the Validated proxied ValidatedExternalRankingService must be unwrapped to use the Mock
-         *
-         *   see PersonControllerIntTest to see how to make this easier with @SpringSpy @UnwrapAopProxy
-         */
-        validatedExternalRankingService = AopTestUtils.getUltimateTargetObject(proxiedValidatedExternalRankingService)
-    }
-
     def "GetRank"() {
-
         when: 'Calling getRank for a known seed data entity'
         MvcResult mvcResult = mvc.perform(get("/persons/1/rank").contentType(APPLICATION_JSON))
                                 .andExpect(status().is2xxSuccessful()).andReturn()
@@ -67,7 +66,7 @@ class PersonControllerIntCachedTest extends Specification {
     def "GetValidatedRank"() {
         when: 'Calling getRank for a known seed data entity'
         MvcResult mvcResult = mvc.perform(get("/persons/1/validatedRank").contentType(APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful()).andReturn()
+                                .andExpect(status().is2xxSuccessful()).andReturn()
 
         then: 'we define the mock for the external service'
         1 * validatedExternalRankingService.getRank(_) >> {
