@@ -1,3 +1,5 @@
+**This is a Spock 1.2 update of the original fork**
+
 **How to inject Spock mocks into Spring integration tests**
 
 This project is intended to be used as en example guide to illustrate how you can use Spock with Spring (and Spring Boot) with a mix of Spring configuration and Spock mocks.
@@ -11,8 +13,5 @@ Thankfully Spock 1.1 introduced the `DetachedMockFactory`. This, combined with t
 The heart of this example lives in our `PersonControllerIntTest`.  The `PersonControllerIntTest` spins up a Spring context so we can make a `MockMvc` call to a REST endpoint which pulls data from an h2 database via a Spring Data repo, but the "Rank" data we would normally get from an external service has been mocked.
 
 Updates:
-* Spock 1.2 provides new @SpringBean, @SpringSpy, and @UnwrapAopProxy annotations to make injecting mocks even easier.
+* Spock 1.2 provides new @SpringBean, @SpringSpy, and @UnwrapAopProxy annotations to make injecting mocks even easier. See `PersonControllerIntSpock12Test`
 * Mocking Spring proxied objects, like @Validated or @Repository, requires unwrapping the proxy to use the mock objects
-
-Testing provided by Travis CI 
-[![Build Status](https://travis-ci.org/snekse/spring-spock-integration-testing.svg?branch=master)](https://travis-ci.org/snekse/spring-spock-integration-testing)
