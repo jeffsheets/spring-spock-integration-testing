@@ -1,4 +1,4 @@
-**This is a Spock 1.2 update of the original fork**
+**This is a Spock 1.2 update of the original code from Derek Eskens @snekse**
 
 Original blog post here: https://objectpartners.com/2017/04/18/spring-integration-testing-with-spock-mocks/
 
